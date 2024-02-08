@@ -1,0 +1,11 @@
+Neisseria Typing WDL
+
+The script take as input all the fastas in the "assemblies" folder
+It will run the docker image "neisseria_typing", containing:
+	- A serogroup search step (call the charactiriza_capsule from the CDC)
+	- A typing step (MLST, BAST, MenDeVar etc)
+	- A merging step: since the programs run in parallele, we want the merge the
+	  outputs to get one report, typing + serogrouping
+
+** For now the neisseria_typing image is in my dockerhub repo 'davidmaimoun' until further
+** instructions (when will move to Terra.Bio)
