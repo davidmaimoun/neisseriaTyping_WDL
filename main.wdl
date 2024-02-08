@@ -88,17 +88,9 @@ task MERGING {
 workflow Workflow {
     input {
         Array[File] assemblies
-        File typing_report
-        File serogrouping_report
 
     }
    
-    call MERGING {
-        input:
-            typing_report = typing_report,
-            serogrouping_report = serogrouping_report
-    }
-
     call TYPING {
         input: 
             assemblies = assemblies
@@ -111,8 +103,8 @@ workflow Workflow {
 
     call MERGING {
         input: 
-            typing_file = TYPING.out,
-            serogrouping_file = SEROGROUPING.out
+            typing_report = TYPING.out,
+            serogrouping_report = SEROGROUPING.out
     }
 
     
