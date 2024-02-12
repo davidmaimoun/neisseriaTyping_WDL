@@ -7,19 +7,19 @@ task TYPING {
     }
 
     command <<<
-        mkdir outputs
+        mkdir results
 
         samples=(~{sep=" " assemblies})
 
         for sample in ${samples[@]};do
             sample_file=$(basename "$sample")
             sample_name="${sample_file%.*}"
-            neisseria_typing ${sample_name} ${sample} outputs
+            neisseria_typing ${sample_name} ${sample} results
         done
     >>>
 
     output {
-        File out = "outputs/typing_report.csv"
+        File out = "results/typing_report.csv"
     }
 
     runtime {
@@ -37,7 +37,7 @@ task SEROGROUPING {
     }
 
     command <<<
-        mkdir serogroup_results
+        mkdir results
         mkdir assemblies_dir
 
         samples=(~{sep=" " assemblies})
@@ -46,12 +46,12 @@ task SEROGROUPING {
             cp ${sample} assemblies_dir
         done
 
-        serogrouping assemblies_dir serogroup_results
+        serogrouping assemblies_dir results
         
     >>>
 
     output {
-        File out = "serogrouping_report.csv"
+        File out = "results/serogroup/serogroup_results.json"
     }
 
 
@@ -67,13 +67,17 @@ task SEROGROUPING {
 task MERGING {
     input {
         File typing_report
-        File serogrouping_report
+        File serogrouping_results
     }
 
     command <<<
         mkdir typing_report
-        merging ~{typing_report} ~{serogrouping_report}
+        merging ~{typing_report} ~{serogrouping_results}
     >>>
+
+     output {
+        File out = stdout()
+    }
 
     runtime {
         cpu : 8
@@ -88,7 +92,6 @@ task MERGING {
 workflow Workflow {
     input {
         Array[File] assemblies
-
     }
    
     call TYPING {
@@ -104,10 +107,15 @@ workflow Workflow {
     call MERGING {
         input: 
             typing_report = TYPING.out,
-            serogrouping_report = SEROGROUPING.out
+            serogrouping_results = SEROGROUPING.out
     }
 
-    
+     meta {
+        description: "A Neisseria Meningitidis typing Workflow"
+        author: "David Maimoun"
+        version: "1.0"
+    }
+  
 
 }    
 
